@@ -24,6 +24,9 @@ $result = $conn->query($sql);
     <script src="https://js.pusher.com/5.0/pusher.min.js"></script>
 
     <script>
+        $(document).ready(function () {
+            document.querySelector("#msg-box").scrollTo(0,document.querySelector("#msg-box").scrollHeight);
+        });
         var pusher = new Pusher('54b390630895bf04e224', {
             cluster: 'ap2'
         });
@@ -35,8 +38,12 @@ $result = $conn->query($sql);
             console.log(data);
             //alert('An event was triggered with message: ' + data.message);
 
-            let template = `
-                            <div class="row msg_container base_sent">
+            let loggedUser = "<?php echo $_SESSION['name'] ?>";
+
+            let template = '';
+
+            if ((loggedUser == data.name)) {
+                template = `<div class="row msg_container base_sent">
                                 <div class="col-xs-10 col-md-10">
                                     <div class="messages msg_sent">
                                         <p>${data.message}</p>
@@ -48,8 +55,27 @@ $result = $conn->query($sql);
                                 </div>
                             </div>
                             `;
+            } else {
+                template = `${data.name}
+
+                            <div class="row msg_container base_receive">
+                                    <div class="col-md-2 col-xs-2 avatar">
+                                        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class=" img-responsive " alt="f">
+                                    </div>
+                                    <div class="col-xs-10 col-md-10">
+                                        <div class="messages msg_receive">
+                                            <p>${data.message}</p>
+                                            <time datetime="2009-11-13T20:00">Timothy • </time>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+            }
+
+
 
             $('#msg-box').append(template);
+            document.querySelector("#msg-box").scrollTo(0,document.querySelector("#msg-box").scrollHeight);
         });
 
 
@@ -62,12 +88,8 @@ $result = $conn->query($sql);
                         name: inputText,
                     },
                     function(data, status){
-
                         $('.chat_input').val('');
                         $('.chat_input').focus();
-
-
-                        document.querySelector("#msg-box").scrollTo(0,document.querySelector("#msg-box").scrollHeight);
                     }
                 );
         }
